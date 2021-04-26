@@ -5,11 +5,11 @@
 </template>
 
 <script>
-  export default {
-    name: 'clear-my-project'
-  }
+export default {
+  name: 'clear-my-project'
+}
 </script>
 
 <style>
-  /* CSS */
+/* CSS */
 </style>
