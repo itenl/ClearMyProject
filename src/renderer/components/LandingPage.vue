@@ -4,7 +4,8 @@
     <main>
       <div class="left-side">
         <span class="title"> Welcome to your new project! {{ this.$route.query.from }} </span>
-        <router-link :to="{ path: '/', query: { from: 'from-landing' } }"> to apple</router-link>
+        <router-link :to="{ path: '/', query: { from: 'from-landing' } }">to apple</router-link>
+        <input type="button" value="go back" @click="goback" />
         <system-information></system-information>
       </div>
 
@@ -37,6 +38,9 @@ export default {
   methods: {
     open(link) {
       this.$electron.shell.openExternal(link)
+    },
+    goback() {
+      window.history.back()
     }
   }
 }
