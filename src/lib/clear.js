@@ -26,8 +26,17 @@ export let FILTER_RESULT = []
 export default (assetsPath, srcPath, config = {}) => {
   if (!assetsPath || assetsPath.length === 0) return alert('Please select assetsPath directory')
   if (!srcPath) return alert('Please select srcPath directory')
+  Reset()
   CONFIG = Object.assign(CONFIG, config)
   DiffRedundancyAssets([ScanningProjectFile(srcPath), ScanningProjectAssets(assetsPath)])
+}
+
+const Reset = () => {
+  FILE_LIST_PATHS.length = 0
+  ASSETS_LIST_PATHS.length = 0
+  ASSETS_PATHS_BY_FILE.length = 0
+  FILE_MAP_ASSETS_PATHS.length = 0
+  FILTER_RESULT.length = 0
 }
 
 const ScanningProjectAssets = assetsPath => {
@@ -36,27 +45,24 @@ const ScanningProjectAssets = assetsPath => {
     assetsPath.forEach(path => {
       let _paths = []
       ScanningDirectory(path, CONFIG.includeAssetsSuffix, _paths, paths => {
-        // ASSETS_LIST_PATHS.push(...paths)
         assets_list_paths.push(...paths)
       })
     })
     resolve(assets_list_paths)
-    // resolve(ASSETS_LIST_PATHS)
   })
 }
 
 const ScanningProjectFile = srcPath => {
   return new Promise((resolve, reject) => {
     let _paths = []
-    ScanningDirectory(srcPath, CONFIG.includeFileSuffix, _paths, paths => {
-      // FILE_LIST_PATHS.push(...paths)
-      let { file_map_assets_path, assets_paths_by_file } = ScanningFile(paths)
+    ScanningDirectory(srcPath, CONFIG.includeFileSuffix, _paths, file_list_paths => {
+      let { file_map_assets_paths, assets_paths_by_file } = ScanningFile(file_list_paths)
       resolve({
-        file_map_assets_path,
-        assets_paths_by_file
+        file_map_assets_paths,
+        assets_paths_by_file,
+        file_list_paths
       })
     })
-    // resolve(FILE_LIST_PATHS)
   })
 }
 
@@ -67,17 +73,16 @@ const DiffRedundancyAssets = task => {
     // res1 源代码文件内引用到的所有资源文件
     // res2 用户所有选择框内找到的图片资源
     if (res1 && res2) {
-      let {
-        assets_paths_by_file
-        // file_map_assets_path
-      } = res1
+      let { file_list_paths, assets_paths_by_file, file_map_assets_paths } = res1
       let assets = assets_paths_by_file.map(m => m.absolutePath)
       res2.filter(r2 => {
         let res = assets.filter(f => f == r2)
         if (!res.length) FILTER_RESULT.push(r2)
-        ASSETS_LIST_PATHS.push(r2)
       })
-      console.log(JSON.stringify(FILTER_RESULT))
+      FILE_LIST_PATHS.push(...file_list_paths)
+      FILE_MAP_ASSETS_PATHS.push(...file_map_assets_paths)
+      ASSETS_PATHS_BY_FILE.push(...assets_paths_by_file)
+      ASSETS_LIST_PATHS.push(...res2)
     }
   })
 }
@@ -97,22 +102,22 @@ const PathResolve = (filePath, assetsFilePaths, assets_paths_by_file) => {
 
 // 扫描文件得到资源路径
 const ScanningFile = paths => {
-  let file_map_assets_path = []
+  let file_map_assets_paths = []
   let assets_paths_by_file = []
   paths.forEach(path => {
     try {
       let txt = fs.readFileSync(path, 'utf-8')
       const assetsFilePaths = ParsingContent(txt)
-      file_map_assets_path.push({
+      file_map_assets_paths.push({
         file: path,
         assets: assetsFilePaths
       })
       PathResolve(path, assetsFilePaths, assets_paths_by_file)
     } catch (error) {}
   })
-  Sort(file_map_assets_path)
+  Sort(file_map_assets_paths)
   return {
-    file_map_assets_path,
+    file_map_assets_paths,
     assets_paths_by_file
   }
 }

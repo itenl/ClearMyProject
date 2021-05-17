@@ -21,7 +21,11 @@
       <!-- {{ assets_list_paths }} -->
       <!-- {{ assets_paths_by_file }} -->
       <!-- {{ file_map_assets_paths }} -->
-      {{ filter_result }}
+      <template v-for="(item, idx) in filter_result">
+        <div :key="idx" class="">
+         {{ idx + 1 }} <a href="javascript:void(0);">{{ item }}</a>
+        </div>
+      </template>
     </div>
   </div>
 </template>
