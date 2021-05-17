@@ -13,7 +13,14 @@
     <br />
     <input type="text" @click="openDialog('src')" placeholder="单击选择源码目录" :value="srcPath" />
     <br />
-    <input @click="submit" type="button" value="开始清理" />
+    <input @click="tosubmit" type="button" value="开始扫描" />
+    <input
+      @click="toclear"
+      :style="filter_result.length == 0 && 'color:#ababab'"
+      :disabled="filter_result.length == 0"
+      type="button"
+      value="一键删除"
+    />
     <div>总资源个数 {{ assets_list_paths.length }}</div>
     <div>冗余文件个数 {{ filter_result.length }}</div>
     <div>
@@ -22,8 +29,25 @@
       <!-- {{ assets_paths_by_file }} -->
       <!-- {{ file_map_assets_paths }} -->
       <template v-for="(item, idx) in filter_result">
-        <div :key="idx" class="">
-         {{ idx + 1 }} <a href="javascript:void(0);">{{ item }}</a>
+        <div :key="idx" class="" style="width:300px;white-space: nowrap;">
+          {{ idx + 1 }}
+          <a
+            style="width: 50%;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;"
+            href="javascript:void(0);"
+            >{{ item }}</a
+          >
+          <a
+            style="width: 50%;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    direction: rtl;"
+            href="javascript:void(0);"
+            >{{ item }}</a
+          >
         </div>
       </template>
     </div>
@@ -43,11 +67,8 @@ export default {
   name: 'index-page',
   data() {
     return {
-      assetsPath: [
-        '/Users/value/Code/gitlab.seedfun.tech/fantasy-rn/fantasy/icons',
-        '/Users/value/Code/gitlab.seedfun.tech/fantasy-rn/fantasy/images'
-      ],
-      srcPath: '/Users/value/Code/gitlab.seedfun.tech/fantasy-rn/fantasy',
+      assetsPath: [],
+      srcPath: '',
       file_list_paths: FILE_LIST_PATHS,
       assets_list_paths: ASSETS_LIST_PATHS,
       assets_paths_by_file: ASSETS_PATHS_BY_FILE,
@@ -56,7 +77,10 @@ export default {
     }
   },
   methods: {
-    submit() {
+    toclear() {
+      confirm('确认一键删除吗(该操作不可逆)') && alert(123)
+    },
+    tosubmit() {
       Clear(this.assetsPath, this.srcPath)
     },
     getUserSelectPath() {
@@ -92,6 +116,11 @@ export default {
 </script>
 
 <style scoped>
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
 #wrapper {
   /* background-color: red; */
 }
