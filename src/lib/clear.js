@@ -2,14 +2,12 @@ const fs = require('fs')
 const path = require('path')
 
 export let CONFIG = {
-  includeAssetsSuffix: ['.jpg', '.png'],
+  // 指定资源文件类型 ['.jpg', '.jpeg', '.png', '.json']
+  includeAssetsSuffix: [],
   // 是否包含隐藏文件
   includeHideFile: false,
-  // 指定源文件后缀名
-  includeFileSuffix: [
-    '.js'
-    // , '.jsx', '.ts', '.tsx'
-  ]
+  // 指定源文件后缀名 ['.js', '.jsx', '.ts', '.tsx']
+  includeFileSuffix: []
 }
 
 // 项目根目录下所有文件
@@ -175,4 +173,19 @@ const ScanningDirectory = (folder, inputExt, exportArr, callback) => {
     })
     files.length === 0 && callback(exportArr)
   })
+}
+
+export const ToClear = (files, callback) => {
+  if (files && files.length) {
+    files.forEach(path => {
+      try {
+        fs.unlinkSync(path)
+      } catch (error) {}
+    })
+    alert('一键删除完成')
+    const timer = setTimeout(() => {
+      callback && callback()
+      clearTimeout(timer)
+    }, 500)
+  }
 }
